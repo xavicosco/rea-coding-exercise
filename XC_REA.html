@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Xavier C. - REA coding exercise</title>
+	<link rel="stylesheet" type="text/css" href="css/styles.css" />
+	<script src="myreact.js"></script>
+	<script src="https://fb.me/react-15.3.0.min.js"></script>
+	<script src="https://fb.me/react-dom-15.3.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.8.24/browser.min.js"></script>
+	
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+
+  </head>
+  <body>
+    <h1>Xavier C - REA coding exercise</h1>
+    
+    <div id="content-results">
+		<h3>Results</h3>
+		<div id="wrap-results">
+			<div class="property-card" id="property-card-1" data-id="1">
+				<div class="header logo" style="background-color:#ffe512">
+					<img src="http://i1.au.reastatic.net/agencylogo/XRWXMT/12/20120927204448.gif">
+				</div>
+				<div class="content property-img">
+					<img src="http://i2.au.reastatic.net/640x480/20bfc8668a30e8cabf045a1cd54814a9042fc715a8be683ba196898333d68cec/main.jpg">
+				</div>
+				<div class="footer">
+					<h3>$726.500</h3>
+					<a class="add">Add</a>
+				</div>	
+			</div>
+		</div>
+    </div>
+	
+	<div id="content-saved">
+		<h3>Saved Properties</h3>
+		<div id="wrap-saved">
+			<div class="property-card">
+				<div class="header logo" style="background-color:#ffe512">
+					<img src="http://i1.au.reastatic.net/agencylogo/XRWXMT/12/20120927204448.gif">
+				</div>
+				<div class="content property-img">
+					<img src="http://i2.au.reastatic.net/640x480/20bfc8668a30e8cabf045a1cd54814a9042fc715a8be683ba196898333d68cec/main.jpg">
+				</div>
+				<div class="footer">
+					<h3>$726.500</h3>
+				</div>	
+			</div>
+		</div>
+    </div>
+	
+	<script type="text/babel">
+
+		var aaa = [{a:1}, {b:2}, {c:3}]
+		var collection = [1, 2, {a: [12, 17, 15]}];
+		
+		var InfoProperty = React.createClass({
+			getInitialState: function(){
+				return { btnResults: 'add', btnSaved: 'remove' };
+			},
+			addToSaved: function(index) {
+				//console.log("add " + index);
+				
+				var newValues = {
+					"price": "$100",
+					"agency": {
+					"brandingColors": {
+					"primary": "#ffe512"
+								},
+					"logo": "http://i1.au.reastatic.net/agencylogo/XRWXMT/12/20120927204448.gif"
+							},
+					"id": "5",
+					"mainImage": "http://i2.au.reastatic.net/640x480/20bfc8668a30e8cabf045a1cd54814a9042fc715a8be683ba196898333d68cec/main.jpg"
+				};
+				
+				var newArray = PROPERTIES.slice();    
+				newArray[0].results.push(newValues);
+				//console.log(newArray);
+				this.setState({PROPERTIES : newArray});
+				//console.log(PROPERTIES);
+				//this.setState(this.state); //render again
+				
+				$(".property-card[data-id='" + index + "']").appendTo("#content-saved");			
+				$(".property-card[data-id='" + index + "'] .footer a").attr("class","remove");
+				$(".property-card[data-id='" + index + "'] .footer a").text("Remove");
+				
+				console.log("1a " + this.props.isSaved);
+				this.props.isSaved = true;
+				this.setState(this.state);
+			},
+			removeToSaved: function(index) {
+				//console.log("remove " + index);
+				$(".property-card[data-id='" + index + "']").appendTo("#content-results");				
+				$(".property-card[data-id='" + index + "'] .footer a").attr("class","add");
+				$(".property-card[data-id='" + index + "'] .footer a").text("Add");
+				this.props.isSaved = false;
+				this.setState(this.state);
+			},
+			handleMouseOver: function()
+			{
+				this.setState({ btnResults: 'add'  });
+			},
+			handleMouseOut: function()
+			{
+				this.setState({ btnResults: 'add hide' });
+				
+			},
+			render: function() {
+				var divStyle = {
+				  backgroundColor: this.props.branding.brandingColors.primary
+			};
+			
+			return ( 
+				/* onMouseOver={this.handleMouseOver()} onMouseOut={this.handleMouseOut()} */
+				<div className="property-card" id="property-card" data-id={this.props.obj.id}>
+					<div className="header logo" style={divStyle}>
+						<img src={this.props.branding.logo} />
+					</div>
+					<div className="content property-img">
+						<img src={this.props.obj.mainImage} />
+					</div>
+					<div className="footer">
+						<h3>{this.props.obj.price}</h3>						
+						{ (this.props.isSaved == "false") ? <a className={this.state.btnResults} onClick={this.addToSaved.bind(this, this.props.obj.id)}>Add</a> : <a className={this.state.btnSaved} onClick={this.removeToSaved.bind(this, this.props.obj.id)}>Remove</a> }
+						
+					</div>	
+				</div>
+			);
+		  }
+		});
+		
+		var WidgetResultsProperty = React.createClass({
+			render: function()
+			{
+				var arrProperties=[];
+				//console.log(this.props.properties[0].results[0].price);
+				this.props.properties[0].results.forEach(function(obj) {
+					arrProperties.push(<InfoProperty obj={obj} branding={obj.agency} isSaved="false" />);
+				});	
+			return(<div>{arrProperties}</div>);				
+			}
+		});
+		
+		var WidgetSavedProperty = React.createClass({
+			render: function()
+			{
+				var arrProperties=[];
+				//console.log(this.props.properties[0].saved[0].price);
+				this.props.properties[0].saved.forEach(function(obj) {
+					arrProperties.push(<InfoProperty obj={obj} branding={obj.agency} isSaved="true" />);
+				});	
+			return(<div>{arrProperties}</div>);				
+			}
+		});
+
+		var PROPERTIES = [
+			{
+			"results": [{
+				"price": "$726,500",
+				"agency": {
+				"brandingColors": {
+				"primary": "#ffe512"
+							},
+				"logo": "http://i1.au.reastatic.net/agencylogo/XRWXMT/12/20120927204448.gif"
+						},
+				"id": "1",
+				"mainImage": "http://i2.au.reastatic.net/640x480/20bfc8668a30e8cabf045a1cd54814a9042fc715a8be683ba196898333d68cec/main.jpg"
+					}, {
+						
+				"price": "$560,520",
+				"agency": {
+				"brandingColors": {
+				"primary": "#fcfa3b"
+							},
+				"logo": "http://i4.au.reastatic.net/agencylogo/BFERIC/12/20150619122858.gif"
+						},
+				"id": "2",
+				"mainImage": "http://i1.au.reastatic.net/640x480/88586227f9176f602d5c19cf06261108dbb29f03e30d1c4ce9fc2b51fb1e4bd6/main.jpg"
+					}, {
+						
+				"price": "$826,500",
+				"agency": {
+				"brandingColors": {
+				"primary": "#57B5E0"
+							},
+				"logo": "http://i1.au.reastatic.net/agencylogo/XCEWIN/12/20150807093203.gif"
+						},
+				"id": "3",
+				"mainImage": "http://i4.au.reastatic.net/640x480/98cee1b2a3a64329921fc38f7e2926a78d41fcc683fc48fb8a8ef2999b14c027/main.jpg"
+					}],
+
+				"saved": [{
+				"price": "$526,500",
+				"agency": {
+				"brandingColors": {
+				"primary": "#000000"
+							},
+				"logo": "http://i2.au.reastatic.net/agencylogo/WVYSSK/2/20140701084436.gif"
+						},
+				"id": "4",
+				"mainImage": "http://i2.au.reastatic.net/640x480/5e84d96722dda3ea2a084d6935677f64872d1d760562d530c3cabfcb7bcda9c2/main.jpg"
+					}]
+				}
+			];		
+		
+		ReactDOM.render(
+		  <WidgetResultsProperty properties={PROPERTIES} />, document.getElementById('wrap-results')
+		);
+		
+		ReactDOM.render(
+		  <WidgetSavedProperty properties={PROPERTIES} />, document.getElementById('wrap-saved')
+		);
+	</script>
+  </body>
+</html>
